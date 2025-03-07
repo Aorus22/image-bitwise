@@ -97,7 +97,7 @@ const grayscale1 = ref(null);
 const grayscale2 = ref(null);
 const resultImages = ref({});
 const isProcessing = ref(false);
-const operations = ['AND', 'OR', 'XOR', 'G1 NOT G2', 'G2 NOT G1', 'NAND', 'NOR'];
+const operations = ['AND', 'OR', 'XOR', 'G1 NOT G2', 'G2 NOT G1', 'NAND', 'NOR', 'NOT G1', 'NOT G2'];
 const selectedOperations = ref([]);
 
 const dragActive = ref([false, false]);
@@ -248,6 +248,12 @@ const applyBitwiseOperation = async (img1, img2, operation) => {
         break;
       case 'NOR':
         result = 255 - (val1 | val2);
+        break;
+      case 'NOT G1':
+        result = 255 - val1;
+        break;
+      case 'NOT G2':
+        result = 255 - val2;
         break;
       default:
         result = 0;
