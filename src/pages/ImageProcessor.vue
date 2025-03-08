@@ -57,9 +57,9 @@
     </div>
 
     <Card v-if="grayscale1 && grayscale2" class="p-4 max-w-5xl w-full">
-      <CardHeader class="flex justify-between items-center">
-        <CardTitle>Image Processing Options</CardTitle>
-        <div class="flex space-x-2">
+      <CardHeader>
+        <div class="flex items-center space-x-2">
+          <CardTitle>Image Processing Options</CardTitle>
           <Button @click="selectAllOperations">Select All</Button>
           <Button @click="deselectAllOperations">Deselect All</Button>
         </div>
