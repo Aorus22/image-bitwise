@@ -101,7 +101,7 @@ const grayscale1 = ref(null);
 const grayscale2 = ref(null);
 const resultImages = ref({});
 const isProcessing = ref(false);
-const operations = ['AND', 'OR', 'XOR', 'XNOR', 'G1 NOT G2', 'G2 NOT G1', 'NAND', 'NOR', 'NOT G1', 'NOT G2', 'Addition', 'Subtraction', 'Multiplication', 'Division'];
+const operations = ['AND', 'OR', 'XOR', 'XNOR', 'NAND', 'NOR', 'NOT G1', 'NOT G2', 'G1 NOT G2', 'G2 NOT G1', 'Addition', 'Subtraction', 'Multiplication', 'Division'];
 const selectedOperations = ref([]);
 
 const dragActive = ref([false, false]);
@@ -244,12 +244,6 @@ const applyBitwiseOperation = async (img1, img2, operation) => {
       case 'XNOR':
         result = 255 - (val1 ^ val2);
         break;
-      case 'G1 NOT G2':
-        result = val1 & (255 - val2);
-        break;
-      case 'G2 NOT G1':
-        result = val2 & (255 - val1);
-        break;
       case 'NAND':
         result = 255 - (val1 & val2);
         break;
@@ -261,6 +255,12 @@ const applyBitwiseOperation = async (img1, img2, operation) => {
         break;
       case 'NOT G2':
         result = 255 - val2;
+        break;
+      case 'G1 NOT G2':
+        result = val1 & (255 - val2);
+        break;
+      case 'G2 NOT G1':
+        result = val2 & (255 - val1);
         break;
       case 'Addition': 
         result = Math.min(val1 + val2, 255); 
