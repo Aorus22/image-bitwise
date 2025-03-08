@@ -59,6 +59,10 @@
     <Card v-if="grayscale1 && grayscale2" class="p-4 max-w-5xl w-full">
       <CardHeader>
         <CardTitle>Image Processing Options</CardTitle>
+        <div class="flex space-x-2">
+          <Button @click="selectAllOperations">Select All</Button>
+          <Button @click="deselectAllOperations">Deselect All</Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -279,5 +283,13 @@ const applyBitwiseOperation = async (img1, img2, operation) => {
 
   ctx.putImageData(resultData, 0, 0);
   return canvas.toDataURL();
+};
+
+const selectAllOperations = () => {
+  selectedOperations.value = [...operations];
+};
+
+const deselectAllOperations = () => {
+  selectedOperations.value = [];
 };
 </script>
