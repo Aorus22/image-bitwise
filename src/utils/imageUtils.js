@@ -65,61 +65,105 @@ export const applyBitwiseOperation = async (img1, img2, operation) => {
   const resultData = ctx.createImageData(width, height);
 
   for (let i = 0; i < data1.data.length; i += 4) {
-    const val1 = data1.data[i];
-    const val2 = data2.data[i];
-    let result;
+    const r1 = data1.data[i];     // Red channel img1
+    const g1 = data1.data[i + 1]; // Green channel img1
+    const b1 = data1.data[i + 2]; // Blue channel img1
+    const r2 = data2.data[i];     // Red channel img2
+    const g2 = data2.data[i + 1]; // Green channel img2
+    const b2 = data2.data[i + 2]; // Blue channel img2
+
+    let r, g, b;
+
+    // Apply bitwise operation for each channel
     switch (operation) {
       case 'AND':
-        result = val1 & val2;
+        r = r1 & r2;
+        g = g1 & g2;
+        b = b1 & b2;
         break;
       case 'OR':
-        result = val1 | val2;
+        r = r1 | r2;
+        g = g1 | g2;
+        b = b1 | b2;
         break;
       case 'XOR':
-        result = val1 ^ val2;
+        r = r1 ^ r2;
+        g = g1 ^ g2;
+        b = b1 ^ b2;
         break;
       case 'XNOR':
-        result = 255 - (val1 ^ val2);
+        r = 255 - (r1 ^ r2);
+        g = 255 - (g1 ^ g2);
+        b = 255 - (b1 ^ b2);
         break;
       case 'NAND':
-        result = 255 - (val1 & val2);
+        r = 255 - (r1 & r2);
+        g = 255 - (g1 & g2);
+        b = 255 - (b1 & b2);
         break;
       case 'NOR':
-        result = 255 - (val1 | val2);
+        r = 255 - (r1 | r2);
+        g = 255 - (g1 | g2);
+        b = 255 - (b1 | b2);
         break;
       case 'NOT G1':
-        result = 255 - val1;
+        r = 255 - r1;
+        g = 255 - g1;
+        b = 255 - b1;
         break;
       case 'NOT G2':
-        result = 255 - val2;
+        r = 255 - r2;
+        g = 255 - g2;
+        b = 255 - b2;
         break;
       case 'G1 NOT G2':
-        result = val1 & (255 - val2);
+        r = r1 & (255 - r2);
+        g = g1 & (255 - g2);
+        b = b1 & (255 - b2);
         break;
       case 'G2 NOT G1':
-        result = val2 & (255 - val1);
+        r = r2 & (255 - r1);
+        g = g2 & (255 - g1);
+        b = b2 & (255 - b1);
         break;
       case 'Addition':
-        result = Math.min(val1 + val2, 255);
+        r = Math.min(r1 + r2, 255);
+        g = Math.min(g1 + g2, 255);
+        b = Math.min(b1 + b2, 255);
         break;
       case 'Subtraction':
-        result = Math.max(val1 - val2, 0);
+        r = Math.max(r1 - r2, 0);
+        g = Math.max(g1 - g2, 0);
+        b = Math.max(b1 - b2, 0);
         break;
       case 'Multiplication':
-        result = Math.min(val1 * val2 / 255, 255);
+        r = Math.min((r1 * r2) / 255, 255);
+        g = Math.min((g1 * g2) / 255, 255);
+        b = Math.min((b1 * b2) / 255, 255);
         break;
       case 'Division':
-        result = val2 !== 0 ? Math.min((val1 / val2) * 255, 255) : 255;
+        r = r2 !== 0 ? Math.min((r1 / r2) * 255, 255) : 255;
+        g = g2 !== 0 ? Math.min((g1 / g2) * 255, 255) : 255;
+        b = b2 !== 0 ? Math.min((b1 / b2) * 255, 255) : 255;
         break;
       default:
-        result = 0;
+        r = g = b = 0;
     }
-    resultData.data[i] = resultData.data[i + 1] = resultData.data[i + 2] = result;
-    resultData.data[i + 3] = 255;
+
+    resultData.data[i] = r;       // Red channel
+    resultData.data[i + 1] = g;   // Green channel
+    resultData.data[i + 2] = b;   // Blue channel
+    resultData.data[i + 3] = 255; // Alpha channel
   }
 
   ctx.putImageData(resultData, 0, 0);
   return canvas.toDataURL();
+};
+
+
+export const invertImage = async (imageSrc) => {
+  const invertedImage = await applyBitwiseOperation(imageSrc, imageSrc, 'NOT G1');
+  return invertedImage;
 };
 
 export const applyHistogramEqualization = (imageSrc) => {
@@ -155,11 +199,17 @@ export const applyHistogramEqualization = (imageSrc) => {
       }
 
       for (let i = 0; i < data.length; i += 4) {
-        const intensity = data[i];
-        const equalizedIntensity = equalizedValues[intensity];
-        data[i] = equalizedIntensity;
-        data[i + 1] = equalizedIntensity;
-        data[i + 2] = equalizedIntensity;
+        const rIntensity = data[i];        // Red
+        const gIntensity = data[i + 1];    // Green
+        const bIntensity = data[i + 2];    // Blue
+      
+        const equalizedR = equalizedValues[rIntensity];
+        const equalizedG = equalizedValues[gIntensity];
+        const equalizedB = equalizedValues[bIntensity];
+      
+        data[i] = equalizedR;
+        data[i + 1] = equalizedG;
+        data[i + 2] = equalizedB;
       }
 
       ctx.putImageData(imageData, 0, 0);
@@ -170,16 +220,14 @@ export const applyHistogramEqualization = (imageSrc) => {
   });
 };
 
-export const drawHistogram = (imageSrc, canvasElement, chartInstance, chartLabel, bgColor, borderColor) => {
+export const drawHistogram = (imageSrc, canvasElement, chartInstance) => {
   return new Promise((resolve, reject) => {
     if (!imageSrc || !canvasElement) {
-      console.error('Image or histogram canvas not available');
       reject(new Error('Image or histogram canvas not available'));
       return;
     }
 
     const ctx = canvasElement.getContext('2d');
-    const histogram = new Array(256).fill(0);
     const tmpCanvas = document.createElement('canvas');
     const tmpCtx = tmpCanvas.getContext('2d');
     const img = new Image();
@@ -191,21 +239,44 @@ export const drawHistogram = (imageSrc, canvasElement, chartInstance, chartLabel
       tmpCtx.drawImage(img, 0, 0);
       const imageData = tmpCtx.getImageData(0, 0, img.width, img.height);
 
+      // Initialize histogram for each channel
+      const histogramR = new Array(256).fill(0);
+      const histogramG = new Array(256).fill(0);
+      const histogramB = new Array(256).fill(0);
+
+      // Calculate frequency of each channel
       for (let i = 0; i < imageData.data.length; i += 4) {
-        histogram[imageData.data[i]]++;
+        histogramR[imageData.data[i]]++;
+        histogramG[imageData.data[i + 1]]++;
+        histogramB[imageData.data[i + 2]]++;
       }
 
       if (chartInstance) chartInstance.destroy();
+
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: Array.from({ length: 256 }, (_, i) => i),
           datasets: [
             {
-              label: chartLabel,
-              data: histogram,
-              backgroundColor: bgColor,
-              borderColor: borderColor,
+              label: 'Red',
+              data: histogramR,
+              backgroundColor: 'rgba(255, 0, 0, 0.5)',
+              borderColor: 'rgba(255, 0, 0, 1)',
+              borderWidth: 1,
+            },
+            {
+              label: 'Green',
+              data: histogramG,
+              backgroundColor: 'rgba(0, 255, 0, 0.5)',
+              borderColor: 'rgba(0, 255, 0, 1)',
+              borderWidth: 1,
+            },
+            {
+              label: 'Blue',
+              data: histogramB,
+              backgroundColor: 'rgba(0, 0, 255, 0.5)',
+              borderColor: 'rgba(0, 0, 255, 1)',
               borderWidth: 1,
             },
           ],
@@ -218,7 +289,7 @@ export const drawHistogram = (imageSrc, canvasElement, chartInstance, chartLabel
             y: { title: { display: true, text: 'Frequency' }, beginAtZero: true },
           },
           plugins: {
-            legend: { display: false },
+            legend: { display: true },
           },
         },
       });
@@ -226,23 +297,18 @@ export const drawHistogram = (imageSrc, canvasElement, chartInstance, chartLabel
       resolve(chartInstance);
     };
 
-    img.onerror = () => {
-      console.error('Error loading image for histogram');
-      reject(new Error('Error loading image for histogram'));
-    };
+    img.onerror = () => reject(new Error('Error loading image for histogram'));
   });
 };
 
 export const drawCumulativeHistogram = (imageSrc, canvasElement, chartInstance) => {
   return new Promise((resolve, reject) => {
     if (!imageSrc || !canvasElement) {
-      console.error('Image or cumulative histogram canvas not available');
       reject(new Error('Image or cumulative histogram canvas not available'));
       return;
     }
 
     const ctx = canvasElement.getContext('2d');
-    const histogram = new Array(256).fill(0);
     const tmpCanvas = document.createElement('canvas');
     const tmpCtx = tmpCanvas.getContext('2d');
     const img = new Image();
@@ -254,27 +320,51 @@ export const drawCumulativeHistogram = (imageSrc, canvasElement, chartInstance) 
       tmpCtx.drawImage(img, 0, 0);
       const imageData = tmpCtx.getImageData(0, 0, img.width, img.height);
 
+      // Initialize histogram for each channel
+      const histogramR = new Array(256).fill(0);
+      const histogramG = new Array(256).fill(0);
+      const histogramB = new Array(256).fill(0);
+
+      // Calculate frequency of each channel
       for (let i = 0; i < imageData.data.length; i += 4) {
-        histogram[imageData.data[i]]++;
+        histogramR[imageData.data[i]]++;
+        histogramG[imageData.data[i + 1]]++;
+        histogramB[imageData.data[i + 2]]++;
       }
 
-      const cumulativeHistogram = new Array(256).fill(0);
-      cumulativeHistogram[0] = histogram[0];
-      for (let i = 1; i < 256; i++) {
-        cumulativeHistogram[i] = cumulativeHistogram[i - 1] + histogram[i];
-      }
+      // Calculate cumulative histogram for each channel
+      const cumulativeR = histogramR.map((_, i, arr) => arr.slice(0, i + 1).reduce((a, b) => a + b));
+      const cumulativeG = histogramG.map((_, i, arr) => arr.slice(0, i + 1).reduce((a, b) => a + b));
+      const cumulativeB = histogramB.map((_, i, arr) => arr.slice(0, i + 1).reduce((a, b) => a + b));
 
       if (chartInstance) chartInstance.destroy();
+
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: Array.from({ length: 256 }, (_, i) => i),
           datasets: [
             {
-              label: 'Cumulative Frequency',
-              data: cumulativeHistogram,
-              borderColor: 'rgba(255, 99, 132, 1)',
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              label: 'Cumulative Red',
+              data: cumulativeR,
+              borderColor: 'rgba(255, 0, 0, 1)',
+              backgroundColor: 'rgba(255, 0, 0, 0.2)',
+              fill: true,
+              tension: 0.1,
+            },
+            {
+              label: 'Cumulative Green',
+              data: cumulativeG,
+              borderColor: 'rgba(0, 255, 0, 1)',
+              backgroundColor: 'rgba(0, 255, 0, 0.2)',
+              fill: true,
+              tension: 0.1,
+            },
+            {
+              label: 'Cumulative Blue',
+              data: cumulativeB,
+              borderColor: 'rgba(0, 0, 255, 1)',
+              backgroundColor: 'rgba(0, 0, 255, 0.2)',
               fill: true,
               tension: 0.1,
             },
@@ -288,7 +378,7 @@ export const drawCumulativeHistogram = (imageSrc, canvasElement, chartInstance) 
             y: { title: { display: true, text: 'Cumulative Frequency' }, beginAtZero: true },
           },
           plugins: {
-            legend: { display: false },
+            legend: { display: true },
           },
         },
       });
@@ -296,9 +386,6 @@ export const drawCumulativeHistogram = (imageSrc, canvasElement, chartInstance) 
       resolve(chartInstance);
     };
 
-    img.onerror = () => {
-      console.error('Error loading image for cumulative histogram');
-      reject(new Error('Error loading image for cumulative histogram'));
-    };
+    img.onerror = () => reject(new Error('Error loading image for cumulative histogram'));
   });
 };

@@ -1,11 +1,11 @@
 <template>
   <div class="w-full min-h-screen flex flex-col justify-center items-center p-6 mx-auto space-y-8 bg-gray-50">
-    <!-- 1. Box Input -->
+    <!-- Box Input -->
     <Card class="max-w-3xl w-full duration-300">
       <CardHeader class="pb-4">
         <CardTitle class="text-2xl font-bold text-gray-800">Image Histogram Analyzer</CardTitle>
         <CardDescription class="text-gray-600">
-          Upload an image to generate its grayscale histogram
+          Upload an image to generate its histogram
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-6">
@@ -38,39 +38,62 @@
           <Input id="imageUpload" type="file" accept="image/*" class="hidden" @change="handleFileUpload" />
         </div>
 
+        <div class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            :id="grayscale"
+            v-model="useGrayscale"
+            :value="useGrayscale"
+            @change="handleImageProcess"
+            class="cursor-pointer h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+          />
+          <Label for="grayscaleCheckbox" class="text-gray-700">
+            Convert to Grayscale First
+          </Label>
+        </div>
+
         <Button
           v-if="image"
-          @click="handleConvertToGrayscale"
+          @click="handleProcessImage"
           class="w-full bg-[#159763] hover:bg-green-700 text-white py-3 rounded-lg transition-all duration-300"
         >
-          Convert to Grayscale
+          Show Histogram
         </Button>
       </CardContent>
     </Card>
 
-    <!-- Grayscale Image, Histogram, and Select Operation -->
-    <div v-if="grayscaleImage" class="max-w-3xl space-y-8 w-full">
-      <!-- 2. Grayscale Image -->
-      <Card>
+    <div v-if="processedImage" class="max-w-3xl space-y-8 w-full">
+      <!-- Grayscale Image -->
+      <Card v-if="useGrayscale">
         <CardHeader class="pb-4">
           <CardTitle class="text-center text-lg font-semibold text-gray-800">Grayscale Image</CardTitle>
         </CardHeader>
         <CardContent>
-          <img :src="grayscaleImage" class="w-full rounded-lg object-cover" />
+          <img :src="processedImage" class="w-full rounded-lg object-cover" />
         </CardContent>
       </Card>
 
-      <!-- 3. Grayscale Histogram -->
+      <!-- Histogram -->
       <Card>
         <CardHeader class="pb-4">
-          <CardTitle class="text-center text-lg font-semibold text-gray-800">Grayscale Histogram</CardTitle>
+          <CardTitle class="text-center text-lg font-semibold text-gray-800">Histogram</CardTitle>
         </CardHeader>
         <CardContent>
           <canvas ref="histogramCanvas"></canvas>
         </CardContent>
       </Card>
 
-      <!-- 4. Select Operation -->
+      <!-- Cumulative Histogram -->
+      <Card>
+        <CardHeader class="pb-4">
+          <CardTitle class="text-center text-lg font-semibold text-gray-800">Cumulative Histogram</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <canvas ref="cumulativeHistogramCanvas" class="w-full h-64"></canvas>
+        </CardContent>
+      </Card>
+
+      <!-- Select Operation -->
       <Card class="bg-white rounded-2xl">
         <CardHeader class="pb-4">
           <CardTitle class="text-center text-lg font-semibold text-gray-800">Select Operation</CardTitle>
@@ -81,27 +104,27 @@
               <SelectValue placeholder="Select an operation" class="text-gray-700" />
             </SelectTrigger>
             <SelectContent class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
+              <SelectItem value="invert" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
+                Invert Image
+              </SelectItem>
               <SelectItem value="histogramEqualization" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
                 Histogram Equalization
-              </SelectItem>
-              <SelectItem value="cumulativeHistogram" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
-                Cumulative Histogram
               </SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
       </Card>
 
-      <!-- A. Histogram Equalization -->
+      <!-- Histogram Equalization -->
       <div v-if="selectedOperation === 'histogramEqualization' && equalizedImage" class="space-y-8">
-        <!-- 5. Grayscale Image + Equalized Image -->
+        <!-- Original Image + Equalized Image -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader class="pb-4">
-              <CardTitle class="text-center text-lg font-semibold text-gray-800">Grayscale Image</CardTitle>
+              <CardTitle class="text-center text-lg font-semibold text-gray-800">Original Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <img :src="grayscaleImage" class="w-full rounded-lg object-cover" />
+              <img :src="processedImage" class="w-full rounded-lg object-cover" />
             </CardContent>
           </Card>
           <Card>
@@ -114,7 +137,7 @@
           </Card>
         </div>
 
-        <!-- 6. Equalized Histogram -->
+        <!-- Equalized Histogram -->
         <Card>
           <CardHeader class="pb-4">
             <CardTitle class="text-center text-lg font-semibold text-gray-800">Equalized Histogram</CardTitle>
@@ -125,15 +148,34 @@
         </Card>
       </div>
 
-      <!-- B. Cumulative Histogram -->
-      <div v-if="selectedOperation === 'cumulativeHistogram'" class="space-y-8">
-        <!-- 5. Cumulative Histogram -->
+      <div v-else-if="selectedOperation === 'invert' && invertedImage" class="space-y-8">
+        <!-- Original Image + Inverted Image -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader class="pb-4">
+              <CardTitle class="text-center text-lg font-semibold text-gray-800">Original Image</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <img :src="processedImage" class="w-full rounded-lg object-cover" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader class="pb-4">
+              <CardTitle class="text-center text-lg font-semibold text-gray-800">Inverted Image</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <img :src="invertedImage" class="w-full rounded-lg object-cover" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <!-- Inverted Histogram -->
         <Card>
           <CardHeader class="pb-4">
-            <CardTitle class="text-center text-lg font-semibold text-gray-800">Cumulative Histogram</CardTitle>
+            <CardTitle class="text-center text-lg font-semibold text-gray-800">Inverted Histogram</CardTitle>
           </CardHeader>
           <CardContent>
-            <canvas ref="cumulativeHistogramCanvas" class="w-full h-64"></canvas>
+            <canvas ref="invertedHistogramCanvas"></canvas>
           </CardContent>
         </Card>
       </div>
@@ -142,27 +184,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { UploadIcon } from 'lucide-vue-next';
 
-import { toGrayscale, applyHistogramEqualization, drawHistogram, drawCumulativeHistogram } from '@/utils/imageUtils';
+import { toGrayscale, invertImage, applyHistogramEqualization, drawHistogram, drawCumulativeHistogram } from '@/utils/imageUtils';
 
 const image = ref(null);
-const grayscaleImage = ref(null);
+const useGrayscale = ref(false);
+const processedImage = ref(null);
 const equalizedImage = ref(null);
+const invertedImage = ref(null);
 const dragActive = ref(false);
 const histogramCanvas = ref(null);
-const equalizedHistogramCanvas = ref(null);
 const cumulativeHistogramCanvas = ref(null);
+const equalizedHistogramCanvas = ref(null);
+const invertedHistogramCanvas = ref(null);
+
 const selectedOperation = ref('');
 let histogramChartInstance = null;
 let equalizedHistogramChartInstance = null;
 let cumulativeHistogramChartInstance = null;
+let invertedHistogramChartInstance = null;
 
 const handleDrop = (event) => {
   dragActive.value = false;
@@ -174,12 +222,12 @@ const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+  const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('Please upload a valid image file (PNG, JPG, JPEG).');
+    alert('Please upload a valid image file (PNG, JPG, JPEG, WEBP).');
     return;
   }
-  if (file.size > 5 * 1024 * 1024) {
+  if (file.size > 100 * 1024 * 1024) {
     alert('File size exceeds 5MB. Please upload a smaller image.');
     return;
   }
@@ -191,37 +239,50 @@ const handleFileUpload = (event) => {
   reader.readAsDataURL(file);
 };
 
-const handleRemoveImage = () => {
-  image.value = null;
-  grayscaleImage.value = null;
+const handleResetProcessedImage = () => {
+  processedImage.value = null;
   equalizedImage.value = null;
   selectedOperation.value = '';
   if (histogramChartInstance) histogramChartInstance.destroy();
   if (equalizedHistogramChartInstance) equalizedHistogramChartInstance.destroy();
   if (cumulativeHistogramChartInstance) cumulativeHistogramChartInstance.destroy();
+}
+
+const handleRemoveImage = () => {
+  image.value = null;
+  handleResetProcessedImage();
 };
 
-const handleConvertToGrayscale = async () => {
-  grayscaleImage.value = await toGrayscale(image.value);
+const handleProcessImage = async () => {
+  processedImage.value = image.value;
+
+  if (useGrayscale.value) {
+    processedImage.value = await toGrayscale(image.value);
+  }
+
   await nextTick();
   drawHistogram(
-    grayscaleImage.value,
+    processedImage.value,
     histogramCanvas.value,
     histogramChartInstance,
     'Pixel Intensity',
     'rgba(75, 192, 192, 0.6)',
     'rgba(75, 192, 192, 1)'
   );
+  drawCumulativeHistogram(
+    processedImage.value,
+    cumulativeHistogramCanvas.value,
+    cumulativeHistogramChartInstance
+  );
 };
 
 const handleOperationChange = async () => {
-  if (!grayscaleImage.value) {
-    console.error('Grayscale image not available');
+  if (!processedImage.value) {
     return;
   }
 
   if (selectedOperation.value === 'histogramEqualization') {
-    equalizedImage.value = await applyHistogramEqualization(grayscaleImage.value);
+    equalizedImage.value = await applyHistogramEqualization(processedImage.value);
     await nextTick();
     drawHistogram(
       equalizedImage.value,
@@ -231,15 +292,25 @@ const handleOperationChange = async () => {
       'rgba(54, 162, 235, 0.6)',
       'rgba(54, 162, 235, 1)'
     );
-  } else if (selectedOperation.value === 'cumulativeHistogram') {
+  } else if (selectedOperation.value === 'invert') {
+    invertedImage.value = await invertImage(processedImage.value);
     await nextTick();
-    drawCumulativeHistogram(
-      grayscaleImage.value,
-      cumulativeHistogramCanvas.value,
-      cumulativeHistogramChartInstance
+    drawHistogram(
+      invertedImage.value,
+      invertedHistogramCanvas.value,
+      invertedHistogramChartInstance,
+      'Pixel Intensity (Equalized)',
+      'rgba(54, 162, 235, 0.6)',
+      'rgba(54, 162, 235, 1)'
     );
   }
 };
+
+watch(useGrayscale, async (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    handleResetProcessedImage();
+  }
+});
 
 </script>
 
