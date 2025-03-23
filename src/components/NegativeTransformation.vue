@@ -41,7 +41,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HistogramChart from '@/components/HistogramChart.vue';
-import { invertImage } from '@/utils/imageUtils-2';
+import { applyNegativeTransformation } from '@/utils/imageUtils-2';
 
 const props = defineProps({
   originalImage: {
@@ -55,7 +55,7 @@ const invertedImage = ref(null);
 
 const processImage = async () => {
   loading.value = true;
-  invertedImage.value = await invertImage(props.originalImage);
+  invertedImage.value = await applyNegativeTransformation(props.originalImage);
   loading.value = false;
 };
 

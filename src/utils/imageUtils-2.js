@@ -1,7 +1,16 @@
-import { applyBitwiseOperation, setupImageProcessing, createDataURL } from '@/utils/imageUtils-1';
+import { setupImageProcessing, createDataURL } from '@/utils/imageUtils-1';
 
-export const invertImage = async (imageSrc) => {
-  return applyBitwiseOperation(imageSrc, imageSrc, 'NOT G1');
+export const applyNegativeTransformation = async (imgSrc) => {
+  const { canvas, ctx, imageData } = await setupImageProcessing(imgSrc);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 255 - data[i];         // Red 
+    data[i + 1] = 255 - data[i + 1]; // Green
+    data[i + 2] = 255 - data[i + 2]; // Blue
+  }
+
+  return createDataURL(canvas, imageData, ctx);
 };
 
 export const calculateHistogram = (imageData) => {
@@ -137,9 +146,11 @@ export const applyBitPlaneSlicing = async (imageSrc, bitPlane) => {
   const data = imageData.data;
 
   for (let i = 0; i < data.length; i += 4) {
-    const gray = data[i];                     // Get the grayscale value from the red channel
-    const bitValue = (gray >> bitPlane) & 1;  // Extract the specific bit at a given position
-    const newPixelValue = bitValue * 255;     // Black (0) or White (255)
+    // Get the grayscale value from the red channel
+    const gray = data[i];                   
+    // Extract the specific bit at a given position  
+    const bitValue = (gray >> bitPlane) & 1;  
+    const newPixelValue = bitValue * 255;     
     
     data[i] = newPixelValue;     // Red
     data[i + 1] = newPixelValue; // Green
