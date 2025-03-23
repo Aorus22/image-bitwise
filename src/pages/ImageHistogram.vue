@@ -20,16 +20,10 @@
       </Card>
 
       <!-- Histogram -->
-      <HistogramChart 
-        :imageData="processedImage" 
-        title="Histogram" 
-      />
+      <HistogramChart :imageData="processedImage" title="Histogram" />
 
       <!-- Cumulative Histogram -->
-      <CumulativeHistogramChart 
-        :imageData="processedImage" 
-        title="Cumulative Histogram" 
-      />
+      <CumulativeHistogramChart :imageData="processedImage" title="Cumulative Histogram" />
 
       <!-- Select Operation -->
       <Card class="bg-white rounded-2xl">
@@ -42,44 +36,31 @@
               <SelectValue placeholder="Select an operation" class="text-gray-700" />
             </SelectTrigger>
             <SelectContent class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-              <SelectItem value="invert" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
-                Invert Image
-              </SelectItem>
-              <SelectItem value="histogramEqualization" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
-                Histogram Equalization
-              </SelectItem>
-              <SelectItem value="gamma" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
-                Gamma Transformation
+              <SelectItem 
+                v-for="operation in operations" 
+                :key="operation.value" 
+                :value="operation.value" 
+                class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100"
+              >
+                {{ operation.label }}
               </SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
       </Card>
 
-      <!-- Histogram Equalization -->
-      <EqualizedImage
-        v-if="selectedOperation === 'histogramEqualization'"
+      <!-- Dynamic Component Rendering -->
+      <component 
+        :is="selectedComponent" 
+        v-if="selectedComponent" 
         :originalImage="processedImage"
       />
-
-      <!-- Inverted Image -->
-      <InvertedImage
-        v-if="selectedOperation === 'invert'"
-        :originalImage="processedImage"
-      />
-
-      <!-- Gamma Transformed Image -->
-      <GammaTransformedImage
-        v-if="selectedOperation === 'gamma'"
-        :originalImage="processedImage"
-      />
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
@@ -89,6 +70,7 @@ import CumulativeHistogramChart from '@/components/CumulativeHistogramChart.vue'
 import EqualizedImage from '@/components/EqualizedImage.vue';
 import InvertedImage from '@/components/InvertedImage.vue';
 import GammaTransformedImage from '@/components/GammaTransformedImage.vue';
+import BitPlaneSlicing from '@/components/BitPlaneSlicing.vue';
 
 import { toGrayscale } from '@/utils/imageUtils';
 
@@ -96,6 +78,18 @@ const image = ref(null);
 const useGrayscale = ref(false);
 const processedImage = ref(null);
 const selectedOperation = ref('');
+
+const operations = [
+  { value: 'invert', label: 'Invert Image', component: InvertedImage },
+  { value: 'histogram-equalization', label: 'Histogram Equalization', component: EqualizedImage },
+  { value: 'gamma', label: 'Gamma Transformation', component: GammaTransformedImage },
+  { value: 'bit-plane-slicing', label: 'Bit Plane Slicing', component: BitPlaneSlicing }
+];
+
+const selectedComponent = computed(() => {
+  const operation = operations.find(op => op.value === selectedOperation.value);
+  return operation ? operation.component : null;
+});
 
 const handleResetProcessedImage = () => {
   processedImage.value = null;

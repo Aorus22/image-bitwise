@@ -416,3 +416,35 @@ export const applyGammaTransformation = (imageSrc, gamma) => {
     img.onerror = () => reject(new Error('Error loading image for gamma transformation'));
   });
 };
+
+export const applyBitPlaneSlicing = (imageSrc, bitPlane) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const gray = data[i];                     // Get the grayscale value from the red channel
+        const bitValue = (gray >> bitPlane) & 1;  // Extract the specific bit at a given position
+        const newPixelValue = bitValue * 255;     // Black (0) atau White (255)
+        
+        data[i] = newPixelValue;     // R
+        data[i + 1] = newPixelValue; // G
+        data[i + 2] = newPixelValue; // B
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = () => reject(new Error('Error loading image for bit-plane slicing'));
+  });
+};
