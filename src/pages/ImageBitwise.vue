@@ -137,7 +137,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UploadIcon } from 'lucide-vue-next';
 
-import { toGrayscale, applyBitwiseOperation } from '@/utils/imageUtils';
+import { toGrayscale, applyBitwiseOperation } from '@/utils/imageUtils-1';
 
 const image1 = ref(null);
 const image2 = ref(null);

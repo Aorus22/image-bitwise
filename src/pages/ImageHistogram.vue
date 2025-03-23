@@ -22,9 +22,6 @@
       <!-- Histogram -->
       <HistogramChart :imageData="processedImage" title="Histogram" />
 
-      <!-- Cumulative Histogram -->
-      <CumulativeHistogramChart :imageData="processedImage" title="Cumulative Histogram" />
-
       <!-- Select Operation -->
       <Card class="bg-white rounded-2xl">
         <CardHeader class="pb-4">
@@ -66,7 +63,6 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 
 import ImageUploader from '@/components/ImageUploader.vue';
 import HistogramChart from '@/components/HistogramChart.vue';
-import CumulativeHistogramChart from '@/components/CumulativeHistogramChart.vue';
 import NegativeTranformation from '@/components/NegativeTransformation.vue';
 import HistogramEqualization from '@/components/HistogramEqualization.vue';
 import GammaTransformation from '@/components/GammaTransformation.vue';
@@ -77,7 +73,7 @@ import HistogramStretching from '@/components/HistogramStretching.vue';
 import ContrastStretching from '@/components/ContrastStretching.vue';
 import IntensityStretching from '@/components/IntensityStretching.vue';
 
-import { toGrayscale } from '@/utils/imageUtils';
+import { toGrayscale } from '@/utils/imageUtils-1';
 
 const image = ref(null);
 const useGrayscale = ref(false);

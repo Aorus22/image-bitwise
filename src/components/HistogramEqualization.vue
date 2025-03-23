@@ -41,7 +41,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HistogramChart from '@/components/HistogramChart.vue';
-import { applyHistogramEqualization } from '@/utils/imageUtils';
+import { applyHistogramEqualization } from '@/utils/imageUtils-2';
 
 const props = defineProps({
   originalImage: {

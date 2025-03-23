@@ -86,7 +86,7 @@ import { ref, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
-import { applyContrastStretching } from '@/utils/imageUtils';
+import { applyContrastStretching } from '@/utils/imageUtils-2';
 
 const props = defineProps({
   originalImage: {

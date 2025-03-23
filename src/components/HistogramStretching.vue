@@ -81,7 +81,7 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
-import { applyHistogramStretching } from '@/utils/imageUtils';
+import { applyHistogramStretching } from '@/utils/imageUtils-2';
 import { debounce } from 'lodash';
 
 const props = defineProps({
