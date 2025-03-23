@@ -34,9 +34,12 @@
           <CardTitle class="text-center text-lg font-semibold text-gray-800">Local Histogram Processed</CardTitle>
         </CardHeader>
         <CardContent>
-          <img v-if="processedImage" :src="processedImage" class="w-full rounded-lg object-cover" />
+          <img v-if="!loading && processedImage" :src="processedImage" class="w-full rounded-lg object-cover" />
+          <div v-else-if="loading" class="w-full h-32 flex items-center justify-center">
+            <p class="text-gray-500">Loading...</p>
+          </div>
           <div v-else class="w-full h-32 flex items-center justify-center">
-            <p class="text-gray-500">Processing...</p>
+            <p class="text-gray-500">Image not available</p>
           </div>
         </CardContent>
       </Card>
@@ -67,11 +70,14 @@ const props = defineProps({
   }
 });
 
+const loading = ref(false);
 const windowSize = ref(9);
 const processedImage = ref(null);
 
 const processImage = async () => {
+  loading.value = true;
   processedImage.value = await applyLocalHistogramEqualization(props.originalImage, windowSize.value);
+  loading.value = false;
 }
 
 onMounted(processImage);

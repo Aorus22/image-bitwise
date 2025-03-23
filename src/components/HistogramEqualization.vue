@@ -15,9 +15,12 @@
           <CardTitle class="text-center text-lg font-semibold text-gray-800">Equalized Image</CardTitle>
         </CardHeader>
         <CardContent>
-          <img v-if="equalizedImage" :src="equalizedImage" class="w-full rounded-lg object-cover" />
+          <img v-if="!loading && equalizedImage" :src="equalizedImage" class="w-full rounded-lg object-cover" />
+          <div v-else-if="loading" class="w-full h-32 flex items-center justify-center">
+            <p class="text-gray-500">Loading...</p>
+          </div>
           <div v-else class="w-full h-32 flex items-center justify-center">
-            <p class="text-gray-500">Processing...</p>
+            <p class="text-gray-500">Image not available</p>
           </div>
         </CardContent>
       </Card>
@@ -47,10 +50,13 @@ const props = defineProps({
   }
 });
 
+const loading = ref(false);
 const equalizedImage = ref(null);
 
 const processImage = async () => {
+  loading.value = true;
   equalizedImage.value = await applyHistogramEqualization(props.originalImage);
+  loading.value = false;
 };
 
 onMounted(processImage);

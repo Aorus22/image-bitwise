@@ -36,9 +36,12 @@
           <CardTitle class="text-center text-lg font-semibold text-gray-800">Bit-Plane {{ bitPlane }}</CardTitle>
         </CardHeader>
         <CardContent>
-          <img v-if="bitPlaneImage" :src="bitPlaneImage" class="w-full rounded-lg object-cover" />
+          <img v-if="!loading && bitPlaneImage" :src="bitPlaneImage" class="w-full rounded-lg object-cover" />
+          <div v-else-if="loading" class="w-full h-32 flex items-center justify-center">
+            <p class="text-gray-500">Loading...</p>
+          </div>
           <div v-else class="w-full h-32 flex items-center justify-center">
-            <p class="text-gray-500">Processing...</p>
+            <p class="text-gray-500">Image not available</p>
           </div>
         </CardContent>
       </Card>
@@ -67,11 +70,14 @@ const props = defineProps({
   }
 });
 
+const loading = ref(false);
 const bitPlane = ref(0);
 const bitPlaneImage = ref(null);
 
 const processBitPlaneImage = async () => {
+  loading.value = true;
   bitPlaneImage.value = await applyBitPlaneSlicing(props.originalImage, bitPlane.value);
+  loading.value = false;
 }
 
 onMounted(processBitPlaneImage);

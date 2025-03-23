@@ -65,9 +65,12 @@
           <CardTitle class="text-center text-lg font-semibold text-gray-800">Contrast Stretched Image</CardTitle>
         </CardHeader>
         <CardContent>
-          <img v-if="stretchedImage" :src="stretchedImage" class="w-full rounded-lg object-cover" />
+          <img v-if="!loading && stretchedImage" :src="stretchedImage" class="w-full rounded-lg object-cover" />
+          <div v-else-if="loading" class="w-full h-32 flex items-center justify-center">
+            <p class="text-gray-500">Loading...</p>
+          </div>
           <div v-else class="w-full h-32 flex items-center justify-center">
-            <p class="text-gray-500">Processing...</p>
+            <p class="text-gray-500">Image not available</p>
           </div>
         </CardContent>
       </Card>
@@ -92,12 +95,15 @@ const props = defineProps({
   }
 });
 
+const loading = ref(false);
 const stretchedImage = ref(null);
 const contrastMin = ref(0);
 const contrastMax = ref(255); 
 
 const processImage = async () => {
+  loading.value = true;
   stretchedImage.value = await applyContrastStretching(props.originalImage, contrastMin.value, contrastMax.value);
+  loading.value = false;
 };
 
 onMounted(processImage);
