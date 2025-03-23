@@ -15,6 +15,7 @@
           step="1"
           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
           @change="handleSliderChange"
+          :disabled="loading"
         />
       </div>
     </div>

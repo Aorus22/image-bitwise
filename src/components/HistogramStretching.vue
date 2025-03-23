@@ -20,6 +20,7 @@
                   step="1"
                   class="w-full"
                   @change="handleSliderChange"
+                  :disabled="loading"
                 />
               </div>
 
@@ -34,6 +35,7 @@
                   step="1"
                   class="w-full"
                   @change="handleSliderChange"
+                  :disabled="loading"
                 />
               </div>
             </div>

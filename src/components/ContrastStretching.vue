@@ -17,7 +17,8 @@
                 max="255"
                 step="1"
                 class="w-full"
-                @input="handleSliderChange"
+                @change="handleSliderChange"
+                :disabled="loading"
               />
             </div>
           </CardContent>
@@ -39,7 +40,8 @@
                 max="255"
                 step="1"
                 class="w-full"
-                @input="handleSliderChange"
+                @change="handleSliderChange"
+                :disabled="loading"
               />
             </div>
           </CardContent>
