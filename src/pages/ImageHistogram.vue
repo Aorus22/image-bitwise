@@ -48,6 +48,9 @@
               <SelectItem value="histogramEqualization" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
                 Histogram Equalization
               </SelectItem>
+              <SelectItem value="gamma" class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100">
+                Gamma Transformation
+              </SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -64,6 +67,13 @@
         v-if="selectedOperation === 'invert'"
         :originalImage="processedImage"
       />
+
+      <!-- Gamma Transformed Image -->
+      <GammaTransformedImage
+        v-if="selectedOperation === 'gamma'"
+        :originalImage="processedImage"
+      />
+
     </div>
   </div>
 </template>
@@ -78,6 +88,7 @@ import HistogramChart from '@/components/HistogramChart.vue';
 import CumulativeHistogramChart from '@/components/CumulativeHistogramChart.vue';
 import EqualizedImage from '@/components/EqualizedImage.vue';
 import InvertedImage from '@/components/InvertedImage.vue';
+import GammaTransformedImage from '@/components/GammaTransformedImage.vue';
 
 import { toGrayscale } from '@/utils/imageUtils';
 

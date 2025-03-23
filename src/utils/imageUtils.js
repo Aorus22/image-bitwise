@@ -388,3 +388,31 @@ export const drawCumulativeHistogram = (imageSrc, canvasElement, chartInstance) 
     img.onerror = () => reject(new Error('Error loading image for cumulative histogram'));
   });
 };
+
+export const applyGammaTransformation = (imageSrc, gamma) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = 255 * Math.pow(data[i] / 255, gamma);         // Red
+        data[i + 1] = 255 * Math.pow(data[i + 1] / 255, gamma); // Green
+        data[i + 2] = 255 * Math.pow(data[i + 2] / 255, gamma); // Blue
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = () => reject(new Error('Error loading image for gamma transformation'));
+  });
+};
