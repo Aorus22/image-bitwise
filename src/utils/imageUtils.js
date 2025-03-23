@@ -160,7 +160,6 @@ export const applyBitwiseOperation = async (img1, img2, operation) => {
   return canvas.toDataURL();
 };
 
-
 export const invertImage = async (imageSrc) => {
   const invertedImage = await applyBitwiseOperation(imageSrc, imageSrc, 'NOT G1');
   return invertedImage;
