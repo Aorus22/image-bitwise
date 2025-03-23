@@ -448,3 +448,178 @@ export const applyBitPlaneSlicing = (imageSrc, bitPlane) => {
     img.onerror = () => reject(new Error('Error loading image for bit-plane slicing'));
   });
 };
+
+export const applyLogTransformation = (imageSrc, scale) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+
+      const c = 255 / Math.log(1 + scale);
+
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = c * Math.log(1 + data[i]);          // Red
+        data[i + 1] = c * Math.log(1 + data[i + 1]); // Green
+        data[i + 2] = c * Math.log(1 + data[i + 2]); // Blue
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = () => reject(new Error('Error loading image for log transformation'));
+  });
+};
+
+export const applyLocalHistogramEqualization = (imageSrc, windowSize) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+      const width = img.width;
+      const height = img.height;
+
+      // Convert image to grayscale
+      const grayscale = new Array(width * height);
+      for (let i = 0; i < data.length; i += 4) {
+        grayscale[i / 4] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      }
+
+      // Apply local histogram equalization
+      const halfWindow = Math.floor(windowSize / 2);
+      const output = new Array(width * height);
+      
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          let histogram = new Array(256).fill(0);
+          let minValue = 255, maxValue = 0;
+
+          // Extract local window
+          for (let j = -halfWindow; j <= halfWindow; j++) {
+            for (let i = -halfWindow; i <= halfWindow; i++) {
+              let nx = x + i;
+              let ny = y + j;
+              if (nx >= 0 && ny >= 0 && nx < width && ny < height) {
+                let pixelValue = grayscale[ny * width + nx];
+                histogram[Math.floor(pixelValue)]++;
+                if (pixelValue < minValue) minValue = pixelValue;
+                if (pixelValue > maxValue) maxValue = pixelValue;
+              }
+            }
+          }
+
+          // Compute cumulative histogram (CDF)
+          let cdf = new Array(256).fill(0);
+          cdf[0] = histogram[0];
+          for (let i = 1; i < 256; i++) {
+            cdf[i] = cdf[i - 1] + histogram[i];
+          }
+
+          let totalPixels = cdf[255];
+          let scaleFactor = 255 / totalPixels;
+
+          // Apply histogram equalization
+          let pixelValue = grayscale[y * width + x];
+          let newValue = Math.floor(scaleFactor * cdf[Math.floor(pixelValue)]);
+          output[y * width + x] = newValue;
+        }
+      }
+
+      // Update the image with the processed values
+      for (let i = 0; i < data.length; i += 4) {
+        data[i] = output[i / 4];     // Red
+        data[i + 1] = output[i / 4]; // Green
+        data[i + 2] = output[i / 4]; // Blue
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = () => reject(new Error('Error loading image for local histogram processing'));
+  });
+};
+
+export const applyHistogramStretching = (imageSrc, rgbMin, rgbMax) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        // Stretch each channel independently
+        data[i] = ((data[i] - rgbMin[0]) / (rgbMax[0] - rgbMin[0])) * 255;          // Red
+        data[i + 1] = ((data[i + 1] - rgbMin[1]) / (rgbMax[1] - rgbMin[1])) * 255; // Green
+        data[i + 2] = ((data[i + 2] - rgbMin[2]) / (rgbMax[2] - rgbMin[2])) * 255; // Blue
+
+        // Clamping to 0-255
+        data[i] = Math.min(255, Math.max(0, data[i]));
+        data[i + 1] = Math.min(255, Math.max(0, data[i + 1]));
+        data[i + 2] = Math.min(255, Math.max(0, data[i + 2]));
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = () => reject(new Error('Error loading image for histogram stretching'));
+  });
+};
+
+export const applyContrastStretching = (imageSrc, contrastMin, contrastMax) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        // Apply contrast stretching formula: (pixel - min) * (255 / (max - min))
+        data[i] = ((data[i] - contrastMin) * (255 / (contrastMax - contrastMin))); // Red
+        data[i + 1] = ((data[i + 1] - contrastMin) * (255 / (contrastMax - contrastMin))); // Green
+        data[i + 2] = ((data[i + 2] - contrastMin) * (255 / (contrastMax - contrastMin))); // Blue
+
+        // Clamping to 0-255
+        data[i] = Math.min(255, Math.max(0, data[i]));
+        data[i + 1] = Math.min(255, Math.max(0, data[i + 1]));
+        data[i + 2] = Math.min(255, Math.max(0, data[i + 2]));
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+
+    img.onerror = () => reject(new Error('Error loading image for contrast stretching'));
+  });
+};

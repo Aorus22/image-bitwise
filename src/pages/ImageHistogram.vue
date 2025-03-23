@@ -67,10 +67,14 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import ImageUploader from '@/components/ImageUploader.vue';
 import HistogramChart from '@/components/HistogramChart.vue';
 import CumulativeHistogramChart from '@/components/CumulativeHistogramChart.vue';
-import EqualizedImage from '@/components/EqualizedImage.vue';
-import InvertedImage from '@/components/InvertedImage.vue';
-import GammaTransformedImage from '@/components/GammaTransformedImage.vue';
+import NegativeTranformation from '@/components/NegativeTransformation.vue';
+import HistogramEqualization from '@/components/HistogramEqualization.vue';
+import GammaTransformation from '@/components/GammaTransformation.vue';
 import BitPlaneSlicing from '@/components/BitPlaneSlicing.vue';
+import LogTransformation from '@/components/LogTransformation.vue';
+import LocalHistogramProcessing from '@/components/LocalHistogramProcessing.vue';
+import HistogramStretching from '@/components/HistogramStretching.vue';
+import ContrastStretching from '@/components/ContrastStretching.vue';
 
 import { toGrayscale } from '@/utils/imageUtils';
 
@@ -80,10 +84,14 @@ const processedImage = ref(null);
 const selectedOperation = ref('');
 
 const operations = [
-  { value: 'invert', label: 'Invert Image', component: InvertedImage },
-  { value: 'histogram-equalization', label: 'Histogram Equalization', component: EqualizedImage },
-  { value: 'gamma', label: 'Gamma Transformation', component: GammaTransformedImage },
-  { value: 'bit-plane-slicing', label: 'Bit Plane Slicing', component: BitPlaneSlicing }
+  { value: 'negative', label: 'Negative Transformation', component: NegativeTranformation },
+  { value: 'log', label: 'Log Transformation', component: LogTransformation },
+  { value: 'gamma', label: 'Gamma Transformation', component: GammaTransformation },
+  { value: 'bit-plane-slicing', label: 'Bit Plane Slicing', component: BitPlaneSlicing },
+  { value: 'contrast-stretching', label: 'Contrast Stretching', component: ContrastStretching },
+  { value: 'histogram-equalization', label: 'Histogram Equalization', component: HistogramEqualization },
+  { value: 'histogram-stretching', label: 'Histogram Stretching', component: HistogramStretching },
+  { value: 'local-histogram', label: 'Local Histogram Processing', component: LocalHistogramProcessing },
 ];
 
 const selectedComponent = computed(() => {

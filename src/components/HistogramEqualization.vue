@@ -50,15 +50,8 @@ const props = defineProps({
 const equalizedImage = ref(null);
 
 const processImage = async () => {
-  if (props.originalImage) {
-    equalizedImage.value = await applyHistogramEqualization(props.originalImage);
-  }
+  equalizedImage.value = await applyHistogramEqualization(props.originalImage);
 };
 
 onMounted(processImage);
-
-watch(() => props.originalImage, async () => {
-  equalizedImage.value = null;
-  await processImage();
-});
 </script>

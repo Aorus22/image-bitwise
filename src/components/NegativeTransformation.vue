@@ -50,15 +50,12 @@ const props = defineProps({
 const invertedImage = ref(null);
 
 const processImage = async () => {
-  if (props.originalImage) {
     invertedImage.value = await invertImage(props.originalImage);
-  }
 };
 
 onMounted(processImage);
 
-watch(() => props.originalImage, async () => {
-  invertedImage.value = null;
+const handleSliderChange = async () => {
   await processImage();
-});
+};
 </script>

@@ -1,24 +1,25 @@
 <template>
   <div class="space-y-6">
-    <!-- Gamma Control -->
+    <!-- Window Size Control -->
     <div class="space-y-2">
       <div class="flex items-center justify-between">
-        <Label for="gamma-slider" class="text-sm font-medium">Gamma Value: {{ gamma }}</Label>
+        <Label for="window-slider" class="text-sm font-medium">Window Size: {{ windowSize }}</Label>
       </div>
       <div class="w-full">
         <input
-          id="gamma-slider"
+          id="window-slider"
           type="range"
-          v-model="gamma"
-          min="0.1"
-          max="3"
-          step="0.1"
+          v-model="windowSize"
+          min="3"
+          max="21"
+          step="2"
           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+          @change="handleSliderChange"
         />
       </div>
     </div>
 
-    <!-- Original Image + Gamma Transformed Image -->
+    <!-- Original Image + Processed Image -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardHeader class="pb-4">
@@ -30,10 +31,10 @@
       </Card>
       <Card>
         <CardHeader class="pb-4">
-          <CardTitle class="text-center text-lg font-semibold text-gray-800">Gamma Transformed Image</CardTitle>
+          <CardTitle class="text-center text-lg font-semibold text-gray-800">Local Histogram Processed</CardTitle>
         </CardHeader>
         <CardContent>
-          <img v-if="gammaImage" :src="gammaImage" class="w-full rounded-lg object-cover" />
+          <img v-if="processedImage" :src="processedImage" class="w-full rounded-lg object-cover" />
           <div v-else class="w-full h-32 flex items-center justify-center">
             <p class="text-gray-500">Processing...</p>
           </div>
@@ -43,11 +44,11 @@
 
     <!-- Histogram -->
     <HistogramChart 
-      v-if="gammaImage"
-      :imageData="gammaImage" 
-      title="Gamma Adjusted Histogram"
-      colorBackground="rgba(255, 99, 132, 0.6)"
-      colorBorder="rgba(255, 99, 132, 1)"
+      v-if="processedImage"
+      :imageData="processedImage" 
+      title="Local Histogram Processed"
+      colorBackground="rgba(255, 159, 64, 0.6)"
+      colorBorder="rgba(255, 159, 64, 1)"
     />
   </div>
 </template>
@@ -57,8 +58,7 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
-import { applyGammaTransformation } from '@/utils/imageUtils';
-import { debounce } from 'lodash';
+import { applyLocalHistogramEqualization } from '@/utils/imageUtils';
 
 const props = defineProps({
   originalImage: {
@@ -67,16 +67,17 @@ const props = defineProps({
   }
 });
 
-const gamma = ref(1);
-const gammaImage = ref(null);
+const windowSize = ref(9);
+const processedImage = ref(null);
 
-const processGammaImage = debounce(async () => {
-  gammaImage.value = await applyGammaTransformation(props.originalImage, gamma.value);
-}, 300);
+const processImage = async () => {
+  processedImage.value = await applyLocalHistogramEqualization(props.originalImage, windowSize.value);
+}
 
-onMounted(processGammaImage);
+onMounted(processImage);
 
-watch(gamma, async () => {
-  await processGammaImage();
-});
+const handleSliderChange = async () => {
+  await processImage();
+};
+
 </script>
