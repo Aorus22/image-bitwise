@@ -75,6 +75,7 @@ import LogTransformation from '@/components/LogTransformation.vue';
 import LocalHistogramProcessing from '@/components/LocalHistogramProcessing.vue';
 import HistogramStretching from '@/components/HistogramStretching.vue';
 import ContrastStretching from '@/components/ContrastStretching.vue';
+import IntensityStretching from '@/components/IntensityStretching.vue';
 
 import { toGrayscale } from '@/utils/imageUtils';
 
@@ -89,6 +90,7 @@ const operations = [
   { value: 'gamma', label: 'Gamma Transformation', component: GammaTransformation },
   { value: 'bit-plane-slicing', label: 'Bit Plane Slicing', component: BitPlaneSlicing },
   { value: 'contrast-stretching', label: 'Contrast Stretching', component: ContrastStretching },
+  { value: 'intensity-stretching', label: 'Intensity Stretching', component: IntensityStretching },
   { value: 'histogram-equalization', label: 'Histogram Equalization', component: HistogramEqualization },
   { value: 'histogram-stretching', label: 'Histogram Stretching', component: HistogramStretching },
   { value: 'local-histogram', label: 'Local Histogram Processing', component: LocalHistogramProcessing },

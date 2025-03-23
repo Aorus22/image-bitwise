@@ -21,7 +21,7 @@
               <p class="text-sm text-gray-600">
                 <span class="font-semibold text-green-600">Click to upload</span> or drag and drop
               </p>
-              <p class="text-xs text-gray-500 mt-1">PNG, JPG, JPEG (Max 5MB)</p>
+              <p class="text-xs text-gray-500 mt-1">PNG, JPG, JPEG (Max 100MB)</p>
             </template>
             <img v-else :src="image" class="h-full w-full object-contain rounded-lg" />
             <button
@@ -100,6 +100,7 @@ const handleDrop = (event) => {
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
+  emit('reset-processed-image');
 
   const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
   if (!validTypes.includes(file.type)) {
