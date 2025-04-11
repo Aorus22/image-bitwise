@@ -1,10 +1,8 @@
 <template>
   <Card class="max-w-3xl w-full duration-300">
     <CardHeader class="pb-4">
-      <CardTitle class="text-2xl font-bold text-gray-800">Image Histogram Analyzer</CardTitle>
-      <CardDescription class="text-gray-600">
-        Upload an image to generate its histogram
-      </CardDescription>
+      <CardTitle class="text-2xl font-bold text-gray-800">{{ title }}</CardTitle>
+      <CardDescription class="text-gray-600">{{ description }}</CardDescription>
     </CardHeader>
     <CardContent class="space-y-6">
       <div class="relative">
@@ -36,20 +34,18 @@
         <Input id="imageUpload" type="file" accept="image/*" class="hidden" @change="handleFileUpload" />
       </div>
 
-      <div class="flex items-center space-x-2">
+      <div v-if="showGrayscaleButton" class="flex items-center space-x-2">
         <input
           type="checkbox"
           id="grayscaleCheckbox"
           v-model="localUseGrayscale"
           class="cursor-pointer h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
         />
-        <Label for="grayscaleCheckbox" class="text-gray-700">
-          Convert to Grayscale First
-        </Label>
+        <Label for="grayscaleCheckbox" class="text-gray-700">Convert to Grayscale First</Label>
       </div>
 
       <Button
-        v-if="image"
+        v-if="image && showButton"
         @click="$emit('process-image')"
         class="w-full bg-[#159763] hover:bg-green-700 text-white py-3 rounded-lg transition-all duration-300"
       >
@@ -60,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,11 +66,27 @@ import { UploadIcon } from 'lucide-vue-next';
 const props = defineProps({
   image: {
     type: String,
-    default: null
+    default: null,
   },
   useGrayscale: {
     type: Boolean,
-    default: false
+    default: false,
+  },
+  title: {
+    type: String,
+    default: 'Image Histogram Analyzer',
+  },
+  description: {
+    type: String,
+    default: 'Upload an image to generate its histogram',
+  },
+  showButton: {
+    type: Boolean,
+    default: true,
+  },
+  showGrayscaleButton: {
+    type: Boolean,
+    default: true,
   }
 });
 
@@ -83,12 +95,12 @@ const emit = defineEmits(['update:image', 'update:useGrayscale', 'process-image'
 const dragActive = ref(false);
 const localImage = computed({
   get: () => props.image,
-  set: (value) => emit('update:image', value)
+  set: (value) => emit('update:image', value),
 });
 
 const localUseGrayscale = computed({
   get: () => props.useGrayscale,
-  set: (value) => emit('update:useGrayscale', value)
+  set: (value) => emit('update:useGrayscale', value),
 });
 
 const handleDrop = (event) => {
@@ -108,7 +120,7 @@ const handleFileUpload = (event) => {
     return;
   }
   if (file.size > 100 * 1024 * 1024) {
-    alert('File size exceeds 100MB. Please upload a smaller image.');
+    alert("File size exceeds 100MB. Please upload a smaller image.");
     return;
   }
 

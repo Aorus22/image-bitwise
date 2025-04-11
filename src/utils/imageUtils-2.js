@@ -53,11 +53,11 @@ export const applyHistogramEqualization = async (imageSrc) => {
     const rIntensity = data[i];        // Red
     const gIntensity = data[i + 1];    // Green
     const bIntensity = data[i + 2];    // Blue
-  
+
     const equalizedR = equalizedValues[rIntensity];
     const equalizedG = equalizedValues[gIntensity];
     const equalizedB = equalizedValues[bIntensity];
-  
+
     data[i] = equalizedR;
     data[i + 1] = equalizedG;
     data[i + 2] = equalizedB;
@@ -81,7 +81,7 @@ export const applyLocalHistogramEqualization = async (imageSrc, windowSize) => {
   // Apply local histogram equalization
   const halfWindow = Math.floor(windowSize / 2);
   const output = new Array(width * height);
-  
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       let histogram = new Array(256).fill(0);
@@ -147,11 +147,11 @@ export const applyBitPlaneSlicing = async (imageSrc, bitPlane) => {
 
   for (let i = 0; i < data.length; i += 4) {
     // Get the grayscale value from the red channel
-    const gray = data[i];                   
-    // Extract the specific bit at a given position  
-    const bitValue = (gray >> bitPlane) & 1;  
-    const newPixelValue = bitValue * 255;     
-    
+    const gray = data[i];
+    // Extract the specific bit at a given position
+    const bitValue = (gray >> bitPlane) & 1;
+    const newPixelValue = bitValue * 255;
+
     data[i] = newPixelValue;     // Red
     data[i + 1] = newPixelValue; // Green
     data[i + 2] = newPixelValue; // Blue
@@ -178,7 +178,7 @@ export const applyLogTransformation = async (imageSrc, scale) => {
 export const applyHistogramStretching = async (imageSrc, rgbMin, rgbMax) => {
   const { canvas, ctx, imageData } = await setupImageProcessing(imageSrc);
   const data = imageData.data;
-  
+
   const clamp = (value) => Math.min(255, Math.max(0, value));
   const stretch = (value, min, max) => ((value - min) * 255) / (max - min);
 

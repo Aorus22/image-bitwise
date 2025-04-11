@@ -1,9 +1,13 @@
 <template>
   <div class="w-full min-h-screen flex flex-col justify-center items-center p-6 mx-auto space-y-8 bg-gray-50">
     <!-- Box Input -->
-    <ImageUploader 
-      v-model:image="image" 
+    <ImageUploader
+      v-model:image="image"
       v-model:useGrayscale="useGrayscale"
+      title="Image Histogram Analyzer"
+      description="Upload an image to generate its histogram"
+      :showButton=true
+      :showGrayscaleButton=true
       @process-image="handleProcessImage"
       @reset-processed-image="handleResetProcessedImage"
     />
@@ -33,10 +37,10 @@
               <SelectValue placeholder="Select an operation" class="text-gray-700" />
             </SelectTrigger>
             <SelectContent class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-              <SelectItem 
-                v-for="operation in operations" 
-                :key="operation.value" 
-                :value="operation.value" 
+              <SelectItem
+                v-for="operation in operations"
+                :key="operation.value"
+                :value="operation.value"
                 class="p-3 cursor-pointer rounded-xl transition-all duration-200 data-[state=active]:bg-green-100 hover:bg-green-100"
               >
                 {{ operation.label }}
@@ -47,9 +51,9 @@
       </Card>
 
       <!-- Dynamic Component Rendering -->
-      <component 
-        :is="selectedComponent" 
-        v-if="selectedComponent" 
+      <component
+        :is="selectedComponent"
+        v-if="selectedComponent"
         :originalImage="processedImage"
       />
     </div>
@@ -63,15 +67,16 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 
 import ImageUploader from '@/components/ImageUploader.vue';
 import HistogramChart from '@/components/HistogramChart.vue';
-import NegativeTranformation from '@/components/NegativeTransformation.vue';
-import HistogramEqualization from '@/components/HistogramEqualization.vue';
-import GammaTransformation from '@/components/GammaTransformation.vue';
-import BitPlaneSlicing from '@/components/BitPlaneSlicing.vue';
-import LogTransformation from '@/components/LogTransformation.vue';
-import LocalHistogramProcessing from '@/components/LocalHistogramProcessing.vue';
-import HistogramStretching from '@/components/HistogramStretching.vue';
-import ContrastStretching from '@/components/ContrastStretching.vue';
-import IntensityStretching from '@/components/IntensityStretching.vue';
+
+import NegativeTranformation from '@/components/tugas2/NegativeTransformation.vue';
+import HistogramEqualization from '@/components/tugas2/HistogramEqualization.vue';
+import GammaTransformation from '@/components/tugas2/GammaTransformation.vue';
+import BitPlaneSlicing from '@/components/tugas2/BitPlaneSlicing.vue';
+import LogTransformation from '@/components/tugas2/LogTransformation.vue';
+import LocalHistogramProcessing from '@/components/tugas2/LocalHistogramProcessing.vue';
+import HistogramStretching from '@/components/tugas2/HistogramStretching.vue';
+import ContrastStretching from '@/components/tugas2/ContrastStretching.vue';
+import IntensityStretching from '@/components/tugas2/IntensityStretching.vue';
 
 import { toGrayscale } from '@/utils/imageUtils-1';
 

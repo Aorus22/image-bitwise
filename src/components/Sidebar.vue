@@ -4,14 +4,15 @@ import { RouterLink, useRoute } from 'vue-router';
 import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Menu, Image, BarChart2 } from 'lucide-vue-next';
+import { Menu, ScanLine, BarChart2, Scan } from 'lucide-vue-next';
 
 const isOpen = ref(false);
 const route = useRoute();
 
 const menuItems = [
-  { path: '/image-bitwise', label: 'Image Bitwise', icon: Image },
+  { path: '/image-bitwise', label: 'Image Bitwise', icon: ScanLine  },
   { path: '/image-histogram', label: 'Image Histogram', icon: BarChart2 },
+  { path: '/edge-detection', label: 'Edge Detection', icon: Scan },
 ];
 
 const isActive = (path) => route.path === path;
