@@ -96,24 +96,46 @@ const processEdgeDetection = async () => {
 
   loading.value = true;
   try {
+    // switch (selectedMethod.value) {
+    //   case 'sobel':
+    //     edgeDetectedImage.value = await performImageOperation(() => applySobel(image.value));
+    //     break;
+    //   case 'prewitt':
+    //     edgeDetectedImage.value = await performImageOperation(() => applyPrewitt(image.value));
+    //     break;
+    //   case 'roberts':
+    //     edgeDetectedImage.value = await performImageOperation(() => applyRoberts(image.value));
+    //     break;
+    //   case 'kirsch':
+    //     edgeDetectedImage.value = await performImageOperation(() => applyKirsch(image.value));
+    //     break;
+    //   case 'log':
+    //     edgeDetectedImage.value = await performImageOperation(() => applyLoG(image.value));
+    //     break;
+    //   case 'kompas':
+    //     edgeDetectedImage.value = await performImageOperation(() => applyKompas(image.value));
+    //     break;
+    //   default:
+    //     edgeDetectedImage.value = null;
+    // }
     switch (selectedMethod.value) {
       case 'sobel':
-        edgeDetectedImage.value = await performImageOperation(() => applySobel(image.value));
+        edgeDetectedImage.value = await applySobel(image.value)
         break;
       case 'prewitt':
-        edgeDetectedImage.value = await performImageOperation(() => applyPrewitt(image.value));
+        edgeDetectedImage.value = await applyPrewitt(image.value)
         break;
       case 'roberts':
-        edgeDetectedImage.value = await performImageOperation(() => applyRoberts(image.value));
+        edgeDetectedImage.value = await applyRoberts(image.value)
         break;
       case 'kirsch':
-        edgeDetectedImage.value = await performImageOperation(() => applyKirsch(image.value));
+        edgeDetectedImage.value = await applyKirsch(image.value)
         break;
       case 'log':
-        edgeDetectedImage.value = await performImageOperation(() => applyLoG(image.value));
+        edgeDetectedImage.value = await applyLoG(image.value)
         break;
       case 'kompas':
-        edgeDetectedImage.value = await performImageOperation(() => applyKompas(image.value));
+        edgeDetectedImage.value = await applyKompas(image.value)
         break;
       default:
         edgeDetectedImage.value = null;
