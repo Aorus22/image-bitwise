@@ -164,3 +164,8 @@ export const applyBitwiseOperation = async (img1, img2, operation) => {
   ctx.putImageData(resultData, 0, 0);
   return canvas.toDataURL();
 };
+
+export const performImageOperation = async (operationFn) => {
+  await Promise.resolve();
+  return operationFn();
+};

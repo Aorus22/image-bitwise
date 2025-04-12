@@ -88,6 +88,7 @@ import { ref, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyIntensityStretching } from '@/utils/imageUtils-2';
 
 const props = defineProps({
@@ -104,7 +105,7 @@ const intensityMax = ref(255);
 
 const processImage = async () => {
   loading.value = true;
-  stretchedImage.value = await applyIntensityStretching(props.originalImage, intensityMin.value, intensityMax.value);
+  stretchedImage.value = await performImageOperation(() => applyIntensityStretching(props.originalImage, intensityMin.value, intensityMax.value));
   loading.value = false;
 };
 

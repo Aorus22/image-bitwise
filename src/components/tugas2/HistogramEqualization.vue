@@ -27,9 +27,9 @@
     </div>
 
     <!-- Equalized Histogram -->
-    <HistogramChart 
+    <HistogramChart
       v-if="equalizedImage"
-      :imageData="equalizedImage" 
+      :imageData="equalizedImage"
       title="Equalized Histogram"
       colorBackground="rgba(54, 162, 235, 0.6)"
       colorBorder="rgba(54, 162, 235, 1)"
@@ -41,6 +41,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyHistogramEqualization } from '@/utils/imageUtils-2';
 
 const props = defineProps({
@@ -55,7 +56,7 @@ const equalizedImage = ref(null);
 
 const processImage = async () => {
   loading.value = true;
-  equalizedImage.value = await applyHistogramEqualization(props.originalImage);
+  equalizedImage.value = await performImageOperation(() => applyHistogramEqualization(props.originalImage));
   loading.value = false;
 };
 

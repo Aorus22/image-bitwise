@@ -78,7 +78,7 @@ import HistogramStretching from '@/components/tugas2/HistogramStretching.vue';
 import ContrastStretching from '@/components/tugas2/ContrastStretching.vue';
 import IntensityStretching from '@/components/tugas2/IntensityStretching.vue';
 
-import { toGrayscale } from '@/utils/imageUtils-1';
+import { toGrayscale, performImageOperation } from '@/utils/imageUtils-1';
 
 const image = ref(null);
 const useGrayscale = ref(false);
@@ -109,7 +109,7 @@ const handleResetProcessedImage = () => {
 
 const handleProcessImage = async () => {
   if (useGrayscale.value) {
-    processedImage.value = await toGrayscale(image.value);
+    processedImage.value = await performImageOperation(toGrayscale(image.value));
   } else {
     processedImage.value = image.value;
   }

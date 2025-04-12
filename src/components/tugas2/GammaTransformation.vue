@@ -62,8 +62,8 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyGammaTransformation } from '@/utils/imageUtils-2';
-import { debounce } from 'lodash';
 
 const props = defineProps({
   originalImage: {
@@ -78,7 +78,7 @@ const gammaImage = ref(null);
 
 const processImage = async () => {
   loading.value = true;
-  gammaImage.value = await applyGammaTransformation(props.originalImage, gamma.value);
+  gammaImage.value = await performImageOperation(() => applyGammaTransformation(props.originalImage, gamma.value));
   loading.value = false;
 }
 

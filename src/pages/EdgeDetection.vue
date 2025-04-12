@@ -71,6 +71,7 @@ import {
   applyLoG,
   applyKompas,
 } from '@/utils/imageUtils-3';
+import { performImageOperation } from '@/utils/imageUtils-1';
 
 const image = ref(null);
 const edgeDetectedImage = ref(null);
@@ -97,22 +98,22 @@ const processEdgeDetection = async () => {
   try {
     switch (selectedMethod.value) {
       case 'sobel':
-        edgeDetectedImage.value = await applySobel(image.value);
+        edgeDetectedImage.value = await performImageOperation(() => applySobel(image.value));
         break;
       case 'prewitt':
-        edgeDetectedImage.value = await applyPrewitt(image.value);
+        edgeDetectedImage.value = await performImageOperation(() => applyPrewitt(image.value));
         break;
       case 'roberts':
-        edgeDetectedImage.value = await applyRoberts(image.value);
+        edgeDetectedImage.value = await performImageOperation(() => applyRoberts(image.value));
         break;
       case 'kirsch':
-        edgeDetectedImage.value = await applyKirsch(image.value);
+        edgeDetectedImage.value = await performImageOperation(() => applyKirsch(image.value));
         break;
       case 'log':
-        edgeDetectedImage.value = await applyLoG(image.value);
+        edgeDetectedImage.value = await performImageOperation(() => applyLoG(image.value));
         break;
       case 'kompas':
-        edgeDetectedImage.value = await applyKompas(image.value);
+        edgeDetectedImage.value = await performImageOperation(() => applyKompas(image.value));
         break;
       default:
         edgeDetectedImage.value = null;

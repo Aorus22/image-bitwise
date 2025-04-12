@@ -48,9 +48,9 @@
     </div>
 
     <!-- Histogram -->
-    <HistogramChart 
+    <HistogramChart
       v-if="bitPlaneImage"
-      :imageData="bitPlaneImage" 
+      :imageData="bitPlaneImage"
       title="Bit-Plane Histogram"
     />
   </div>
@@ -61,6 +61,7 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyBitPlaneSlicing } from '@/utils/imageUtils-2';
 
 const props = defineProps({
@@ -76,7 +77,7 @@ const bitPlaneImage = ref(null);
 
 const processBitPlaneImage = async () => {
   loading.value = true;
-  bitPlaneImage.value = await applyBitPlaneSlicing(props.originalImage, bitPlane.value);
+  bitPlaneImage.value = await performImageOperation(() => applyBitPlaneSlicing(props.originalImage, bitPlane.value));
   loading.value = false;
 }
 

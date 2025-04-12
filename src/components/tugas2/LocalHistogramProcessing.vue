@@ -47,9 +47,9 @@
     </div>
 
     <!-- Histogram -->
-    <HistogramChart 
+    <HistogramChart
       v-if="processedImage"
-      :imageData="processedImage" 
+      :imageData="processedImage"
       title="Local Histogram Processed"
       colorBackground="rgba(255, 159, 64, 0.6)"
       colorBorder="rgba(255, 159, 64, 1)"
@@ -62,6 +62,7 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyLocalHistogramEqualization } from '@/utils/imageUtils-2';
 
 const props = defineProps({
@@ -77,7 +78,7 @@ const processedImage = ref(null);
 
 const processImage = async () => {
   loading.value = true;
-  processedImage.value = await applyLocalHistogramEqualization(props.originalImage, windowSize.value);
+  processedImage.value = await performImageOperation(() => applyLocalHistogramEqualization(props.originalImage, windowSize.value));
   loading.value = false;
 }
 

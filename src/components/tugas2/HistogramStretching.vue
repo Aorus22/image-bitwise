@@ -83,8 +83,8 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyHistogramStretching } from '@/utils/imageUtils-2';
-import { debounce } from 'lodash';
 
 const props = defineProps({
   originalImage: {
@@ -100,7 +100,7 @@ const rgbMax = ref([255, 255, 255]);
 
 const processImage = async () => {
   loading.value = true;
-  stretchedImage.value = await applyHistogramStretching(props.originalImage, rgbMin.value, rgbMax.value);
+  stretchedImage.value = await performImageOperation(() => applyHistogramStretching(props.originalImage, rgbMin.value, rgbMax.value));
   loading.value = false;
 }
 

@@ -16,7 +16,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { setupImageProcessing } from '@/utils/imageUtils-1';
+import { setupImageProcessing, performImageOperation } from '@/utils/imageUtils-1';
 import { calculateHistogram } from '@/utils/imageUtils-2';
 import Chart from 'chart.js/auto';
 import zoomPlugin from 'chartjs-plugin-zoom';
@@ -50,7 +50,7 @@ const drawHistogram = async (imageSrc, canvasElement, chartInstance) => {
   }
 
   const { imageData } = await setupImageProcessing(imageSrc);
-  const { histogramR, histogramG, histogramB } = calculateHistogram(imageData);
+  const { histogramR, histogramG, histogramB } = await performImageOperation(() => calculateHistogram(imageData));
 
   if (chartInstance) chartInstance.destroy();
 
@@ -96,12 +96,12 @@ const drawHistogram = async (imageSrc, canvasElement, chartInstance) => {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        x: { 
+        x: {
           title: { display: true, text: 'Intensity' },
           min: 0,
           max: 255
         },
-        y: { 
+        y: {
           title: { display: true, text: 'Frequency' },
           beginAtZero: true,
           min: 0
@@ -149,7 +149,7 @@ const renderHistogram = async () => {
     if (histogramChartInstance) {
       histogramChartInstance.destroy();
     }
-    
+
     histogramChartInstance = await drawHistogram(
       props.imageData,
       histogramCanvas.value,

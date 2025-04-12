@@ -27,9 +27,9 @@
     </div>
 
     <!-- Inverted Histogram -->
-    <HistogramChart 
+    <HistogramChart
       v-if="invertedImage"
-      :imageData="invertedImage" 
+      :imageData="invertedImage"
       title="Inverted Histogram"
       colorBackground="rgba(54, 162, 235, 0.6)"
       colorBorder="rgba(54, 162, 235, 1)"
@@ -41,6 +41,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyNegativeTransformation } from '@/utils/imageUtils-2';
 
 const props = defineProps({
@@ -55,7 +56,7 @@ const invertedImage = ref(null);
 
 const processImage = async () => {
   loading.value = true;
-  invertedImage.value = await applyNegativeTransformation(props.originalImage);
+  invertedImage.value = await performImageOperation(() => applyNegativeTransformation(props.originalImage));
   loading.value = false;
 };
 

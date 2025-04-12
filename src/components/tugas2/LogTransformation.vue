@@ -47,9 +47,9 @@
     </div>
 
     <!-- Histogram -->
-    <HistogramChart 
+    <HistogramChart
       v-if="logImage"
-      :imageData="logImage" 
+      :imageData="logImage"
       title="Log Adjusted Histogram"
       colorBackground="rgba(54, 162, 235, 0.6)"
       colorBorder="rgba(54, 162, 235, 1)"
@@ -62,8 +62,8 @@ import { ref, watch, onMounted } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import HistogramChart from '@/components/HistogramChart.vue';
+import { performImageOperation } from '@/utils/imageUtils-1';
 import { applyLogTransformation } from '@/utils/imageUtils-2';
-import { debounce } from 'lodash';
 
 const props = defineProps({
   originalImage: {
@@ -78,7 +78,7 @@ const logImage = ref(null);
 
 const processImage = async () => {
   loading.value = true;
-  logImage.value = await applyLogTransformation(props.originalImage, logScale.value);
+  logImage.value = await performImageOperation(() => applyLogTransformation(props.originalImage, logScale.value));
   loading.value = false;
 }
 

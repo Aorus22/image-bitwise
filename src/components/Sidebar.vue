@@ -57,7 +57,7 @@ const isActive = (path) => route.path === path;
         <Button
           variant="outline"
           size="icon"
-          class="border-none md:hidden fixed top-4 left-4 z-40 bg-white shadow-md hover:bg-green-50 transition-colors duration-300"
+          class="border-none md:hidden fixed top-4 left-4 z-40 bg-white hover:bg-green-50 transition-colors duration-300"
         >
           <Menu class="h-5 w-5 text-gray-600" />
           <span class="sr-only">Toggle menu</span>

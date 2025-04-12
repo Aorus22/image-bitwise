@@ -11,7 +11,7 @@
       <CardContent class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="(img, index) in [image1, image2]" :key="index" class="relative space-y-2">
-            <Label :for="'image' + (index + 1)">
+            <Label :for="'image' + (index + 1)" @click="triggerFileInput(index)">
               <div
                 class="h-64 w-full border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden"
                 :class="dragActive[index] ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-green-400 hover:bg-green-50'"
@@ -38,6 +38,7 @@
             </Label>
             <Input
               :id="'image' + (index + 1)"
+              :ref="index === 0 ? 'fileInput1' : 'fileInput2'"
               type="file"
               accept="image/*"
               class="hidden"
@@ -130,14 +131,14 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref } from 'vue';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UploadIcon } from 'lucide-vue-next';
 
-import { toGrayscale, applyBitwiseOperation } from '@/utils/imageUtils-1';
+import { toGrayscale, applyBitwiseOperation, performImageOperation } from '@/utils/imageUtils-1';
 
 const image1 = ref(null);
 const image2 = ref(null);
@@ -149,6 +150,8 @@ const operations = ['AND', 'OR', 'XOR', 'XNOR', 'NAND', 'NOR', 'NOT G1', 'NOT G2
 const selectedOperations = ref([]);
 
 const dragActive = ref([false, false]);
+const fileInput1 = ref(null);
+const fileInput2 = ref(null);
 
 const setDragActive = (index, value) => {
   dragActive.value[index] = value;
@@ -157,12 +160,27 @@ const setDragActive = (index, value) => {
 const handleDrop = (event, index) => {
   setDragActive(index, false);
   const file = event.dataTransfer.files[0];
-  if (file) handleFileUpload({ target: { files: [file] } }, index);
+  if (file) {
+    const fileInput = index === 0 ? fileInput1.value : fileInput2.value;
+    if (fileInput) {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+      handleFileUpload({ target: fileInput }, index);
+    }
+  }
 };
 
 const handleFileUpload = (event, index) => {
   const file = event.target.files[0];
   if (!file) return;
+
+  const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+  if (!validTypes.includes(file.type)) {
+    alert('Please upload a valid image file (PNG, JPG, JPEG).');
+    event.target.value = '';
+    return;
+  }
 
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -171,15 +189,30 @@ const handleFileUpload = (event, index) => {
     } else {
       image2.value = e.target.result;
     }
+    event.target.value = '';
+  };
+  reader.onerror = () => {
+    alert('Error reading file. Please try again.');
+    event.target.value = '';
   };
   reader.readAsDataURL(file);
+};
+
+const triggerFileInput = (index) => {
+  const fileInput = index === 0 ? fileInput1.value : fileInput2.value;
+  if (fileInput) {
+    fileInput.value = '';
+    fileInput.click();
+  }
 };
 
 const handleRemoveImage = (index) => {
   if (index === 0) {
     image1.value = null;
+    if (fileInput1.value) fileInput1.value.value = '';
   } else {
     image2.value = null;
+    if (fileInput2.value) fileInput2.value.value = '';
   }
   grayscale1.value = null;
   grayscale2.value = null;
@@ -198,7 +231,7 @@ const handleProcessImages = async () => {
   try {
     const results = {};
     for (const op of selectedOperations.value) {
-      results[op] = await applyBitwiseOperation(grayscale1.value, grayscale2.value, op);
+      results[op] = await performImageOperation(applyBitwiseOperation(grayscale1.value, grayscale2.value, op));
     }
     resultImages.value = results;
   } catch (error) {

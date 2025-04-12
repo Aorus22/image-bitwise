@@ -6,7 +6,7 @@
     </CardHeader>
     <CardContent class="space-y-6">
       <div class="relative">
-        <Label for="imageUpload">
+        <Label for="imageUpload" @click="triggerFileInput">
           <div
             class="h-64 w-full border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden"
             :class="dragActive ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-green-400 hover:bg-green-50'"
@@ -31,7 +31,14 @@
             </button>
           </div>
         </Label>
-        <Input id="imageUpload" type="file" accept="image/*" class="hidden" @change="handleFileUpload" />
+        <Input
+          id="imageUpload"
+          type="file"
+          accept="image/*"
+          class="hidden"
+          ref="fileInput"
+          @change="handleFileUpload"
+        />
       </div>
 
       <div v-if="showGrayscaleButton" class="flex items-center space-x-2">
@@ -87,12 +94,14 @@ const props = defineProps({
   showGrayscaleButton: {
     type: Boolean,
     default: true,
-  }
+  },
 });
 
 const emit = defineEmits(['update:image', 'update:useGrayscale', 'process-image', 'reset-processed-image']);
 
 const dragActive = ref(false);
+const fileInput = ref(null);
+
 const localImage = computed({
   get: () => props.image,
   set: (value) => emit('update:image', value),
@@ -103,36 +112,59 @@ const localUseGrayscale = computed({
   set: (value) => emit('update:useGrayscale', value),
 });
 
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.value = '';
+    fileInput.value.click();
+  }
+};
+
 const handleDrop = (event) => {
   dragActive.value = false;
   const file = event.dataTransfer.files[0];
-  if (file) handleFileUpload({ target: { files: [file] } });
+  if (file && fileInput.value) {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.value.files = dataTransfer.files;
+    handleFileUpload({ target: fileInput.value });
+  }
 };
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
+
   emit('reset-processed-image');
 
   const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
   if (!validTypes.includes(file.type)) {
     alert('Please upload a valid image file (PNG, JPG, JPEG, WEBP).');
+    event.target.value = '';
     return;
   }
   if (file.size > 100 * 1024 * 1024) {
-    alert("File size exceeds 100MB. Please upload a smaller image.");
+    alert('File size exceeds 100MB. Please upload a smaller image.');
+    event.target.value = '';
     return;
   }
 
   const reader = new FileReader();
   reader.onload = (e) => {
     localImage.value = e.target.result;
+    event.target.value = '';
+  };
+  reader.onerror = () => {
+    alert('Error reading file. Please try again.');
+    event.target.value = '';
   };
   reader.readAsDataURL(file);
 };
 
 const handleRemoveImage = () => {
   localImage.value = null;
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
   emit('reset-processed-image');
 };
 </script>
